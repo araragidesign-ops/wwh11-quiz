@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>この9人は、誰でしょう？ ｜ Wako's Music Holiday Concert Vol.11</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Noto+Serif+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#1c130d;
+    --panel:#2a1c12;
+    --panel-2:#332416;
+    --line:#4a3722;
+    --parchment:#f2e6c9;
+    --ivory:#faf3e2;
+    --gold:#c8a35a;
+    --gold-bright:#e6c886;
+    --burgundy:#6d1c24;
+    --burgundy-bright:#8a2530;
+    --ink:#2a1e14;
+    --muted:#a3906f;
+    --ok:#3f6b4a;
+    --ok-text:#a9d3ae;
+    --ng-text:#e3a49d;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:radial-gradient(ellipse at top, #2a1c12 0%, #1c130d 60%), var(--bg);
+    color:var(--ivory);
+    font-family:"Noto Serif JP", serif;
+    line-height:1.8;
+    -webkit-font-smoothing:antialiased;
+  }
+  .page{max-width:920px;margin:0 auto;padding:44px 18px 80px;}
+  .screen[hidden]{display:none;}
+
+  /* ---------- Header ---------- */
+  header{text-align:center;margin-bottom:40px;}
+  .eyebrow{
+    font-family:"Cormorant Garamond", serif;
+    letter-spacing:0.22em;font-size:13.5px;
+    color:var(--gold-bright);text-transform:uppercase;margin:0 0 14px;
+  }
+  .eyebrow em{color:var(--burgundy-bright);font-style:normal;}
+  h1{
+    font-weight:700;font-size:clamp(26px,5vw,40px);
+    margin:0 0 18px;letter-spacing:0.02em;
+  }
+  .divider{
+    width:130px;height:1px;margin:0 auto 22px;
+    background:linear-gradient(90deg,transparent,var(--gold),transparent);
+    position:relative;
+  }
+  .divider::before{
+    content:"❧";position:absolute;left:50%;top:50%;
+    transform:translate(-50%,-52%);background:var(--bg);
+    padding:0 10px;color:var(--gold);font-size:16px;
+  }
+  .lede{max-width:660px;margin:0 auto;color:var(--parchment);font-size:15.5px;opacity:0.92;}
+  .lede b{color:var(--gold-bright);font-weight:600;}
+
+  /* ---------- Photo ---------- */
+  .photo-frame{
+    padding:9px;
+    background:linear-gradient(155deg,var(--gold-bright),var(--gold) 40%,#8a6a30 100%);
+    border-radius:6px;box-shadow:0 18px 40px -12px rgba(0,0,0,0.6);
+  }
+  .photo-wrap{position:relative;width:100%;line-height:0;border-radius:3px;overflow:hidden;}
+  .photo-wrap img{width:100%;height:auto;display:block;}
+  .pin{
+    position:absolute;transform:translate(-50%,-50%);
+    width:30px;height:30px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,var(--gold-bright),var(--gold) 55%,#8a6a30 100%);
+    border:2px solid #fff8e6;
+    box-shadow:0 2px 7px rgba(0,0,0,0.6),inset 0 0 0 1px rgba(255,255,255,0.25);
+    color:#2a1c10;font-family:"Cormorant Garamond",serif;font-weight:600;font-size:15px;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .pin:hover,.pin:focus-visible{
+    transform:translate(-50%,-50%) scale(1.16);
+    box-shadow:0 4px 12px rgba(0,0,0,.65),inset 0 0 0 1px rgba(255,255,255,.45);
+    outline:none;
+  }
+  .pin.answered{background:radial-gradient(circle at 35% 30%,#cfe3d1,var(--ok) 60%,#294a32 100%);color:#eef7ef;}
+  .pin.conductor{
+    width:auto;min-width:30px;padding:0 10px;border-radius:15px;
+    font-family:"Noto Serif JP",serif;font-size:11px;font-weight:600;letter-spacing:.04em;
+    background:radial-gradient(circle at 35% 30%,#efe2d0,var(--parchment) 60%,#b79a68 100%);
+    cursor:default;white-space:nowrap;
+  }
+  .pin.conductor:hover{transform:translate(-50%,-50%);}
+  .caption{text-align:center;font-size:12.5px;color:var(--muted);margin:10px 0 40px;letter-spacing:.03em;}
+
+  /* ---------- Answer sheet ---------- */
+  .sheet{
+    background:var(--panel);border:1px solid var(--line);border-radius:8px;
+    padding:30px 24px 26px;box-shadow:0 20px 40px -20px rgba(0,0,0,.6);
+  }
+  .sheet-head{text-align:center;margin-bottom:22px;}
+  .sheet-head h2{
+    font-family:"Cormorant Garamond",serif;font-size:26px;font-weight:600;
+    color:var(--gold-bright);margin:0 0 6px;letter-spacing:.05em;
+  }
+  .sheet-head p{font-size:13.5px;color:var(--parchment);opacity:.8;margin:0;}
+
+  .rows{display:grid;gap:10px;}
+  .row{
+    background:var(--panel-2);border:1px solid var(--line);
+    border-radius:6px;padding:11px 14px;
+  }
+  .row-main{display:grid;grid-template-columns:32px 1fr auto;align-items:center;gap:12px;}
+  .row-num{
+    width:30px;height:30px;border-radius:50%;
+    background:linear-gradient(155deg,var(--gold-bright),var(--gold));
+    color:var(--ink);display:flex;align-items:center;justify-content:center;
+    font-family:"Cormorant Garamond",serif;font-weight:600;font-size:15px;
+  }
+  select{
+    width:100%;appearance:none;-webkit-appearance:none;
+    background:var(--ivory) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="9"><path d="M1 1l6 6 6-6" stroke="%232a1e14" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>') no-repeat right 12px center;
+    color:var(--ink);border:1px solid #b79a68;border-radius:4px;
+    padding:9px 32px 9px 12px;font-family:"Noto Serif JP",serif;font-size:14.5px;cursor:pointer;
+  }
+  select:focus-visible{outline:2px solid var(--gold-bright);outline-offset:2px;}
+  .hint-btn{
+    background:transparent;border:1px solid #6b563a;color:var(--parchment);
+    border-radius:14px;padding:6px 15px;font-family:"Noto Serif JP",serif;
+    font-size:12.5px;cursor:pointer;white-space:nowrap;
+    transition:border-color .12s ease,color .12s ease,background .12s ease;
+  }
+  .hint-btn:hover{border-color:var(--gold);color:var(--gold-bright);}
+  .hint-btn[aria-expanded="true"]{background:rgba(200,163,90,.14);border-color:var(--gold);color:var(--gold-bright);}
+  .hint-btn:focus-visible{outline:2px solid var(--gold-bright);outline-offset:2px;}
+  .hint{
+    margin:10px 0 0 44px;padding:10px 14px;
+    background:rgba(242,230,201,.07);border-left:2px solid var(--gold);
+    border-radius:0 4px 4px 0;font-size:13.5px;color:var(--parchment);line-height:1.75;
+  }
+  .hint[hidden]{display:none;}
+
+  .actions{display:flex;justify-content:center;gap:14px;margin-top:26px;flex-wrap:wrap;}
+  button.primary,button.secondary{
+    font-family:"Noto Serif JP",serif;font-size:15px;font-weight:600;letter-spacing:.06em;
+    padding:12px 32px;border-radius:3px;cursor:pointer;transition:transform .12s ease;
+  }
+  button.primary{
+    background:linear-gradient(155deg,var(--burgundy-bright),var(--burgundy));
+    color:var(--ivory);border:1px solid #a8434c;box-shadow:0 8px 18px -8px rgba(109,28,36,.7);
+  }
+  button.primary:hover{transform:translateY(-1px);}
+  button.secondary{background:transparent;color:var(--parchment);border:1px solid #6b563a;}
+  button.secondary:hover{border-color:var(--gold);color:var(--gold-bright);}
+  button:focus-visible{outline:2px solid var(--gold-bright);outline-offset:3px;}
+
+  .notice{
+    text-align:center;margin-top:16px;font-size:13.5px;color:var(--ng-text);min-height:1.4em;
+  }
+
+  /* ---------- Result screen ---------- */
+  .result-head{text-align:center;margin-bottom:34px;}
+  .score{
+    font-family:"Cormorant Garamond",serif;
+    font-size:clamp(52px,13vw,86px);line-height:1;color:var(--gold-bright);
+    margin:0;letter-spacing:.02em;
+  }
+  .score small{font-size:.42em;color:var(--parchment);opacity:.75;}
+  .score-label{
+    font-size:13px;letter-spacing:.24em;text-transform:uppercase;
+    font-family:"Cormorant Garamond",serif;color:var(--muted);margin:0 0 10px;
+  }
+  .verdict{font-size:17px;color:var(--ivory);margin:18px 0 0;font-weight:600;}
+  .verdict .sub{display:block;font-size:14px;font-weight:400;color:var(--parchment);opacity:.85;margin-top:8px;}
+
+  .perfect{
+    margin:26px auto 0;max-width:560px;padding:26px 24px;
+    background:linear-gradient(155deg,rgba(230,200,134,.16),rgba(109,28,36,.22));
+    border:1px solid var(--gold);border-radius:8px;
+    box-shadow:0 0 0 4px rgba(200,163,90,.08);
+  }
+  .perfect .crest{font-size:26px;color:var(--gold-bright);line-height:1;margin-bottom:10px;}
+  .perfect h3{margin:0 0 8px;font-size:20px;color:var(--gold-bright);letter-spacing:.03em;}
+  .perfect p{margin:0;font-size:14.5px;color:var(--ivory);}
+  .perfect .stamp{
+    display:inline-block;margin-top:16px;padding:6px 16px;
+    border:1px solid var(--gold);border-radius:3px;
+    font-family:"Cormorant Garamond",serif;font-size:12.5px;letter-spacing:.18em;
+    color:var(--gold-bright);text-transform:uppercase;
+  }
+
+  .answers{display:grid;gap:9px;margin-top:8px;}
+  .ans{
+    display:grid;grid-template-columns:32px 22px 1fr;align-items:start;gap:12px;
+    background:var(--panel-2);border:1px solid var(--line);border-radius:6px;padding:11px 14px;
+  }
+  .ans.correct{border-color:#3f6b4a;background:rgba(63,107,74,.13);}
+  .ans.wrong{border-color:#7a3a34;background:rgba(122,58,52,.11);}
+  .ans .mark{font-size:17px;line-height:1.5;}
+  .ans.correct .mark{color:var(--ok-text);}
+  .ans.wrong .mark{color:var(--ng-text);}
+  .ans .body{font-size:14px;}
+  .ans .name{font-weight:600;color:var(--ivory);}
+  .ans .piece{color:var(--parchment);opacity:.8;font-size:13px;}
+  .ans .yours{display:block;font-size:12.5px;color:var(--ng-text);margin-top:4px;}
+
+  .extra{
+    margin-top:26px;padding:18px 20px;border:1px dashed var(--line);border-radius:6px;
+    font-size:13.5px;color:var(--parchment);text-align:center;
+  }
+  .extra b{color:var(--gold-bright);}
+
+  footer{text-align:center;margin-top:44px;font-size:12px;color:var(--muted);letter-spacing:.03em;}
+
+  @media (max-width:520px){
+    .pin{width:26px;height:26px;font-size:13px;}
+    .pin.conductor{font-size:9.5px;padding:0 7px;}
+    .sheet{padding:22px 15px 20px;}
+    .row-main{grid-template-columns:28px 1fr;grid-template-areas:"num sel" "hint hint";}
+    .row-num{grid-area:num;}
+    .row-main select{grid-area:sel;}
+    .hint-btn{grid-area:hint;width:100%;margin-top:8px;}
+    .hint{margin-left:0;}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;}html{scroll-behavior:auto;}}
+</style>
+</head>
+<body>
+
+<!-- ========== SCREEN 1 : QUIZ ========== -->
+<div class="page screen" id="quizScreen">
+
+  <header>
+    <p class="eyebrow"><em>W</em>ako's Music Holiday Concert Vol.11 — 音の絵本</p>
+    <h1>この9人は、誰でしょう？</h1>
+    <div class="divider"></div>
+    <p class="lede">集合写真の9人の紳士は、それぞれ今回演奏する曲の<b>作曲家</b>に扮しています。番号を手がかりに、下の回答用紙で作曲家を当ててみてください。候補は10名 —— じつは<b>1人だけ、写真に写っていません。</b></p>
+  </header>
+
+  <div class="photo-frame">
+    <div class="photo-wrap" id="photoWrap">
+      <img src="photo.jpg" alt="作曲家に扮した9人の紳士と指揮者の集合写真">
+    </div>
+  </div>
+  <p class="caption">番号をクリックすると、対応する回答欄にジャンプします</p>
+
+  <section class="sheet">
+    <div class="sheet-head">
+      <h2>回答用紙</h2>
+      <p>各番号にふさわしい作曲家を選んでください。迷ったら「ヒント」をどうぞ</p>
+    </div>
+
+    <div class="rows" id="rows"></div>
+
+    <div class="actions">
+      <button class="primary" id="checkBtn">採点する</button>
+      <button class="secondary" id="clearBtn">選び直す</button>
+    </div>
+    <p class="notice" id="notice"></p>
+  </section>
+
+  <footer>主催：ワコーズミュージックホリデイ実行委員会 ｜ 2026.10.18 青山ホール</footer>
+</div>
+
+<!-- ========== SCREEN 2 : RESULT ========== -->
+<div class="page screen" id="resultScreen" hidden>
+
+  <div class="result-head">
+    <p class="eyebrow"><em>W</em>ako's Music Holiday Concert Vol.11 — 音の絵本</p>
+    <h1>採点結果</h1>
+    <div class="divider"></div>
+    <p class="score-label">Your Score</p>
+    <p class="score" id="scoreNum"></p>
+    <p class="verdict" id="verdict"></p>
+    <div id="perfectBox"></div>
+  </div>
+
+  <div class="answers" id="answers"></div>
+
+  <div class="extra" id="extra"></div>
+
+  <div class="actions">
+    <button class="secondary" id="backBtn">もう一度挑戦する</button>
+  </div>
+
+  <footer>主催：ワコーズミュージックホリデイ実行委員会 ｜ 2026.10.18 青山ホール</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- Data ---------- */
+  var composers = [
+    { id:"suppe",       name:"スッペ",           piece:"軽騎兵序曲" },
+    { id:"handel",      name:"ヘンデル",          piece:"オンブラ・マイ・フ" },
+    { id:"puccini",     name:"プッチーニ",        piece:"私のお父さん" },
+    { id:"saintsaens",  name:"サン=サーンス",     piece:"白鳥" },
+    { id:"schumann",    name:"シューマン",        piece:"トロイメライ" },
+    { id:"liszt",       name:"リスト",            piece:"愛の夢" },
+    { id:"chopin",      name:"ショパン",          piece:"子犬のワルツ" },
+    { id:"mussorgsky",  name:"ムソルグスキー",    piece:"展覧会の絵 より" },
+    { id:"tchaikovsky", name:"チャイコフスキー",  piece:"くるみ割り人形より「花のワルツ」" },
+    { id:"borodin",     name:"ボロディン",        piece:"ダッタン人の踊り 他" }
+  ];
+  var composerMap = {};
+  composers.forEach(function(c){ composerMap[c.id] = c; });
+
+  /* x / y are percentages of the photo. Placed on the chest, clear of every face. */
+  var positions = [
+    { num:1, x:18.9, y:29.3, correct:"mussorgsky",
+      hint:"もじゃもじゃ頭とひげ、粗いコート姿は、酒浸りで身なりが乱れていた晩年の姿" },
+    { num:2, x:32.4, y:27.8, correct:"borodin",
+      hint:"手に持っているのは化学書。作曲家であると同時に化学者としても有名。" },
+    { num:3, x:45.6, y:31.5, correct:"tchaikovsky",
+      hint:"胸に挿しているのは「花」" },
+    { num:4, x:58.0, y:31.5, correct:"handel",
+      hint:"髪の毛は当然、カツラ。時代をうかがわせます。" },
+    { num:5, x:73.9, y:33.7, correct:"liszt",
+      hint:"長い髪、高い鼻。そしてピアニストを思わせる細く長い指。服装はハンガリーの正装です。" },
+    { num:6, x:84.0, y:32.2, correct:"puccini",
+      hint:"整った身なりのイタリア紳士風の雰囲気があります。後年はかなりふくよかになりました。" },
+    { num:7, x:43.7, y:52.7, correct:"chopin",
+      hint:"抱いているのは子犬！" },
+    { num:8, x:58.8, y:52.7, correct:"schumann",
+      hint:"指を押さえているのは、指を故障したピアニストだから？" },
+    { num:9, x:74.9, y:52.7, correct:"saintsaens",
+      hint:"足元には白鳥！" }
+  ];
+  var conductor = { x:18.6, y:52.7, label:"指揮：菅生和光" };
+
+  var quizScreen   = document.getElementById("quizScreen");
+  var resultScreen = document.getElementById("resultScreen");
+
+  /* ---------- Pins on the photo ---------- */
+  var photoWrap = document.getElementById("photoWrap");
+
+  positions.forEach(function(pos){
+    var pin = document.createElement("button");
+    pin.type = "button";
+    pin.className = "pin";
+    pin.textContent = pos.num;
+    pin.style.left = pos.x + "%";
+    pin.style.top  = pos.y + "%";
+    pin.dataset.num = pos.num;
+    pin.setAttribute("aria-label", "回答欄 " + pos.num + " へ移動");
+    pin.addEventListener("click", function(){
+      var sel = document.querySelector('select[data-num="' + pos.num + '"]');
+      if (sel){ sel.scrollIntoView({behavior:"smooth", block:"center"}); sel.focus(); }
+    });
+    photoWrap.appendChild(pin);
+  });
+
+  var cPin = document.createElement("div");
+  cPin.className = "pin conductor";
+  cPin.textContent = conductor.label;
+  cPin.style.left = conductor.x + "%";
+  cPin.style.top  = conductor.y + "%";
+  photoWrap.appendChild(cPin);
+
+  /* ---------- Answer rows ---------- */
+  var rowsEl = document.getElementById("rows");
+
+  positions.forEach(function(pos){
+    var row = document.createElement("div");
+    row.className = "row";
+
+    var main = document.createElement("div");
+    main.className = "row-main";
+
+    var numEl = document.createElement("div");
+    numEl.className = "row-num";
+    numEl.textContent = pos.num;
+
+    var select = document.createElement("select");
+    select.dataset.num = pos.num;
+    select.setAttribute("aria-label", pos.num + "番の作曲家");
+
+    var blank = document.createElement("option");
+    blank.value = "";
+    blank.textContent = "ー 選択してください ー";
+    select.appendChild(blank);
+
+    composers.forEach(function(c){
+      var opt = document.createElement("option");
+      opt.value = c.id;
+      opt.textContent = c.name;
+      select.appendChild(opt);
+    });
+
+    var hintBtn = document.createElement("button");
+    hintBtn.type = "button";
+    hintBtn.className = "hint-btn";
+    hintBtn.textContent = "ヒント";
+    hintBtn.setAttribute("aria-expanded", "false");
+    hintBtn.setAttribute("aria-controls", "hint-" + pos.num);
+
+    var hint = document.createElement("p");
+    hint.className = "hint";
+    hint.id = "hint-" + pos.num;
+    hint.textContent = pos.hint;
+    hint.hidden = true;
+
+    hintBtn.addEventListener("click", function(){
+      var open = hint.hidden;
+      hint.hidden = !open;
+      hintBtn.setAttribute("aria-expanded", open ? "true" : "false");
+      hintBtn.textContent = open ? "ヒントを隠す" : "ヒント";
+    });
+
+    select.addEventListener("change", function(){
+      refreshOptions();
+      var pin = document.querySelector('.pin[data-num="' + pos.num + '"]');
+      if (pin) pin.classList.toggle("answered", !!select.value);
+      document.getElementById("notice").textContent = "";
+    });
+
+    main.appendChild(numEl);
+    main.appendChild(select);
+    main.appendChild(hintBtn);
+    row.appendChild(main);
+    row.appendChild(hint);
+    rowsEl.appendChild(row);
+  });
+
+  function allSelects(){
+    return Array.prototype.slice.call(document.querySelectorAll("select[data-num]"));
+  }
+
+  /* the same composer can only be used once */
+  function refreshOptions(){
+    var selects = allSelects();
+    var chosen = selects.map(function(s){ return s.value; }).filter(Boolean);
+    selects.forEach(function(s){
+      Array.prototype.slice.call(s.options).forEach(function(opt){
+        if (!opt.value) return;
+        opt.disabled = chosen.indexOf(opt.value) !== -1 && s.value !== opt.value;
+      });
+    });
+  }
+
+  /* ---------- Screen switching ---------- */
+  function showQuiz(){
+    resultScreen.hidden = true;
+    quizScreen.hidden = false;
+    window.scrollTo(0, 0);
+  }
+  function showResult(){
+    quizScreen.hidden = true;
+    resultScreen.hidden = false;
+    window.scrollTo(0, 0);
+  }
+
+  /* ---------- Grading ---------- */
+  document.getElementById("checkBtn").addEventListener("click", function(){
+    var unanswered = positions.filter(function(pos){
+      return !document.querySelector('select[data-num="' + pos.num + '"]').value;
+    });
+
+    if (unanswered.length){
+      document.getElementById("notice").textContent =
+        "まだ " + unanswered.length + " 問、答えが選ばれていません。すべて選んでから採点してください。";
+      var first = document.querySelector('select[data-num="' + unanswered[0].num + '"]');
+      first.scrollIntoView({behavior:"smooth", block:"center"});
+      first.focus();
+      return;
+    }
+    document.getElementById("notice").textContent = "";
+
+    var correctCount = 0;
+    var answersEl = document.getElementById("answers");
+    answersEl.innerHTML = "";
+
+    positions.forEach(function(pos){
+      var val = document.querySelector('select[data-num="' + pos.num + '"]').value;
+      var isRight = (val === pos.correct);
+      if (isRight) correctCount++;
+
+      var right = composerMap[pos.correct];
+      var yours = composerMap[val];
+
+      var item = document.createElement("div");
+      item.className = "ans " + (isRight ? "correct" : "wrong");
+
+      var num = document.createElement("div");
+      num.className = "row-num";
+      num.textContent = pos.num;
+
+      var mark = document.createElement("div");
+      mark.className = "mark";
+      mark.textContent = isRight ? "◎" : "✗";
+
+      var body = document.createElement("div");
+      body.className = "body";
+
+      var nameEl = document.createElement("span");
+      nameEl.className = "name";
+      nameEl.textContent = right.name;
+
+      var pieceEl = document.createElement("span");
+      pieceEl.className = "piece";
+      pieceEl.textContent = "　《" + right.piece + "》";
+
+      body.appendChild(nameEl);
+      body.appendChild(pieceEl);
+
+      if (!isRight){
+        var yoursEl = document.createElement("span");
+        yoursEl.className = "yours";
+        yoursEl.textContent = "あなたの回答：" + yours.name;
+        body.appendChild(yoursEl);
+      }
+
+      item.appendChild(num);
+      item.appendChild(mark);
+      item.appendChild(body);
+      answersEl.appendChild(item);
+    });
+
+    var total = positions.length;
+    document.getElementById("scoreNum").innerHTML =
+      correctCount + '<small> / ' + total + '</small>';
+
+    var verdict = document.getElementById("verdict");
+    var perfectBox = document.getElementById("perfectBox");
+    perfectBox.innerHTML = "";
+
+    if (correctCount === total){
+      verdict.innerHTML = "全問正解です。お見事！";
+      var box = document.createElement("div");
+      box.className = "perfect";
+      box.innerHTML =
+        '<div class="crest">❧</div>' +
+        '<h3>おめでとうございます！</h3>' +
+        '<p>受付でこのページをお見せください</p>' +
+        '<span class="stamp">All Correct — 9 / 9</span>';
+      perfectBox.appendChild(box);
+    } else if (correctCount >= 6){
+      verdict.innerHTML = "あと少しです。" +
+        "<span class='sub'>ヒントをもう一度ひらいて、写真の細部を見比べてみてください。</span>";
+    } else {
+      verdict.innerHTML = "写真をもう一度じっくり眺めてみましょう。" +
+        "<span class='sub'>手もとの持ちもの、胸もと、足もと —— 小さな仕掛けが隠れています。</span>";
+    }
+
+    document.getElementById("extra").innerHTML =
+      '写真に描かれなかった10人目は <b>スッペ《軽騎兵序曲》</b> でした。当日はこの曲で開演します。';
+
+    showResult();
+  });
+
+  document.getElementById("clearBtn").addEventListener("click", function(){
+    allSelects().forEach(function(s){ s.value = ""; });
+    positions.forEach(function(pos){
+      var pin = document.querySelector('.pin[data-num="' + pos.num + '"]');
+      if (pin) pin.classList.remove("answered");
+    });
+    document.getElementById("notice").textContent = "";
+    refreshOptions();
+  });
+
+  document.getElementById("backBtn").addEventListener("click", function(){
+    allSelects().forEach(function(s){ s.value = ""; });
+    positions.forEach(function(pos){
+      var pin = document.querySelector('.pin[data-num="' + pos.num + '"]');
+      if (pin) pin.classList.remove("answered");
+      var hint = document.getElementById("hint-" + pos.num);
+      if (hint) hint.hidden = true;
+    });
+    Array.prototype.slice.call(document.querySelectorAll(".hint-btn")).forEach(function(b){
+      b.setAttribute("aria-expanded", "false");
+      b.textContent = "ヒント";
+    });
+    refreshOptions();
+    showQuiz();
+  });
+
+})();
+</script>
+</body>
+</html>
